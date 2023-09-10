@@ -1,4 +1,5 @@
-## 1. docker-compose.yml
+## Quick setup
+### Use docker compose:
 
 ```yml
 version: "3.5"
@@ -13,7 +14,7 @@ services:
       RESTREAMER_KEY: <YOUR_RESTREAMER_STREAM_KEY>
 ```
 
-## 2. docker run
+### Use docker run:
 
 ```sh
 docker run -d \
@@ -25,7 +26,7 @@ docker run -d \
     nickydev/nostr-stream-utils:latest
 ```
 
-## 3. git clone
+### Use git clone:
 
 1. Clone repository
 
