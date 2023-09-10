@@ -17,7 +17,7 @@ services:
 
 ```sh
 docker run -d \
-    --restart always
+    --restart always \
     --name nostr-stream-utils \
     --env PRIVATE_KEY=<YOUR_NOSTR_PRIVATE_KEY> \
     --env RESTREAMER_SERVER=<YOUR_RESTREAMER_SERVER> \
