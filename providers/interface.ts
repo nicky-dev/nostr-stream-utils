@@ -1,4 +1,5 @@
 export interface StreamProvider {
+  streamKey?: string;
   /**
    *
    */
@@ -9,6 +10,8 @@ export interface StreamProvider {
   getRecordUrl?: () => string;
 
   getSnapshotUrl?: () => string;
+
+  setStreamKeyFromUrl: (streamUrl: string) => void;
 }
 
 export interface StreamStats {

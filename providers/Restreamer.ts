@@ -2,13 +2,17 @@ import { StreamProvider, StreamStats } from "./interface";
 
 export class Restreamer implements StreamProvider {
   private server: string;
-  private streamKey: string;
 
-  constructor(server: string, streamKey: string) {
+  public streamKey?: string;
+
+  constructor(server: string) {
     this.server = server;
-    this.streamKey = streamKey;
   }
-
+  setStreamKeyFromUrl(streamUrl: string) {
+    this.streamKey = streamUrl.match(
+      /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/
+    )?.[0];
+  }
   async fetchStats() {
     const url = `${this.server}/api/v3/widget/process/restreamer-ui:ingest:${this.streamKey}`;
     const result = await fetch(url);

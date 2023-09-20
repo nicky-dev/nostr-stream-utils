@@ -1,8 +1,13 @@
 import NDK, { NDKEvent } from "@nostr-dev-kit/ndk";
 import { StreamProvider, StreamStats } from "../providers/interface";
+// import m3u8stream from "m3u8stream";
+import fs from "fs";
+import path from "path";
+import https from "https";
 
 const UPTIME_CHECK_MAX_ATTEMPS = 5;
-
+const RECORDING_PATH = "./recording";
+const SNAPSHOT_PATH = "./snapshot";
 export class LiveEvent {
   event?: NDKEvent;
   ndk: NDK;
@@ -12,13 +17,12 @@ export class LiveEvent {
   currentPaticipants?: string = "0";
   status: "live" | "ended" = "live";
   liveId?: string;
-  streamProvider?: StreamProvider;
+  streamProvider: StreamProvider;
+  streamingUrl?: string;
+  recordingUrl?: string;
 
-  constructor(ndk: NDK) {
+  constructor(ndk: NDK, provider: StreamProvider) {
     this.ndk = ndk;
-  }
-
-  setStreamProvider(provider: StreamProvider) {
     this.streamProvider = provider;
   }
 
@@ -27,22 +31,52 @@ export class LiveEvent {
     this.liveId = this.event.tagValue("d");
     this.currentPaticipants =
       this.event.tagValue("current_participants") || "0";
+    this.liveId = this.event.tagValue("d");
+    this.streamingUrl = this.event.tagValue("streaming") || "";
+    this.streamProvider.setStreamKeyFromUrl(this.streamingUrl);
     this.log(this.currentPaticipants, "viewers");
   }
 
   start() {
     this.started = true;
     this.updateLiveStats();
+    // this.updateSnapshot();
+    // this.record();
   }
   stop() {
     this.started = false;
     clearTimeout(this.timeoutHandler);
   }
 
+  // record() {
+  //   if (!this.liveId || !this.streamingUrl) return;
+  //   const recording = path.join(RECORDING_PATH, `${this.liveId}.mp4`);
+  //   m3u8stream(this.streamingUrl).pipe(fs.createWriteStream(recording));
+  // }
+
+  // updateSnapshot() {
+  //   if (!this.liveId || !this.streamingUrl) return;
+  //   const snapshot = path.join(SNAPSHOT_PATH, `${this.liveId}.jpg`);
+  //   const file = fs.createWriteStream(snapshot);
+  //   const snapshotUrl = this.streamingUrl.replace(".m3u8", ".jpg");
+  //   https
+  //     .get(snapshotUrl, (response) => {
+  //       response.pipe(file);
+  //       file.on("finish", () => {
+  //         file.close();
+  //         console.log(`Image downloaded as ${snapshot}`);
+  //       });
+  //     })
+  //     .on("error", (err) => {
+  //       fs.unlink(snapshot, () => {});
+  //       console.error(`Error downloading image: ${err.message}`);
+  //     });
+  // }
+
   async updateLiveStats() {
     try {
       if (!this.isReady()) return;
-      const stats = await this.streamProvider!.fetchStats();
+      const stats = await this.streamProvider.fetchStats();
       if (this.isOnline(stats)) {
         this.uptimeCheckAttempts = 0;
       } else {

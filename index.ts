@@ -16,10 +16,6 @@ if (!process.env.RESTREAMER_SERVER) {
   throw new Error("environment variable `RESTREAMER_SERVER` does not set");
 }
 
-if (!process.env.RESTREAMER_KEY) {
-  throw new Error("environment variable `RESTREAMER_KEY` does not set");
-}
-
 const events: Record<string, LiveEvent> = {};
 const privateKeySigner = new NDKPrivateKeySigner(process.env.PRIVATE_KEY);
 const ndk = new NDK({
@@ -27,17 +23,11 @@ const ndk = new NDK({
     ? process.env.RELAYS.split(",")
         .map((d) => d.trim())
         .filter((d) => !!d)
-    : [
-        "wss://relay.snort.social",
-        "wss://nos.lol",
-        "wss://relay.damus.io",
-        "wss://nostr.wine",
-      ],
+    : ["wss://relay.nostr.band", "wss://relay.snort.social"],
   signer: privateKeySigner,
 });
 
-const run = async () => {
-  await ndk.connect();
+const liveStreamHandler = async () => {
   const ndkUser = await privateKeySigner.user();
   const subscription = ndk.subscribe(
     { kinds: [30311 as NDKKind], authors: [ndkUser.hexpubkey()] },
@@ -50,19 +40,22 @@ const run = async () => {
     if (status !== "live") return;
     let liveEvent = events[streamId];
     if (!liveEvent) {
-      liveEvent = new LiveEvent(ndk);
-      events[streamId] = liveEvent;
       const streamProvider = new Restreamer(
-        process.env.RESTREAMER_SERVER || "",
-        process.env.RESTREAMER_KEY || ""
+        process.env.RESTREAMER_SERVER || ""
       );
-      liveEvent.setStreamProvider(streamProvider);
+      liveEvent = new LiveEvent(ndk, streamProvider);
+      events[streamId] = liveEvent;
     }
     liveEvent.setEvent(event);
     if (!liveEvent.started) {
       liveEvent.start();
     }
   });
+};
+
+const run = async () => {
+  await ndk.connect();
+  liveStreamHandler();
 };
 
 run();
