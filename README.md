@@ -11,7 +11,6 @@ services:
     environment:
       PRIVATE_KEY: <YOUR_NOSTR_PRIVATE_KEY>
       RESTREAMER_SERVER: <YOUR_RESTREAMER_SERVER>
-      RESTREAMER_KEY: <YOUR_RESTREAMER_STREAM_KEY>
 ```
 
 ### Use docker run:
@@ -22,7 +21,6 @@ docker run -d \
     --name nostr-stream-utils \
     --env PRIVATE_KEY=<YOUR_NOSTR_PRIVATE_KEY> \
     --env RESTREAMER_SERVER=<YOUR_RESTREAMER_SERVER> \
-    --env RESTREAMER_KEY=<YOUR_RESTREAMER_STREAM_KEY> \
     nickydev/nostr-stream-utils:latest
 ```
 
@@ -40,7 +38,6 @@ cd nostr-stream-utils
 ```ini
 PRIVATE_KEY=<YOUR_NOSTR_PRIVATE_KEY>
 RESTREAMER_SERVER=<YOUR_RESTREAMER_SERVER>
-RESTREAMER_KEY=<YOUR_RESTREAMER_STREAM_KEY>
 ```
 
 3. Start
