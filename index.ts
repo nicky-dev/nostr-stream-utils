@@ -23,7 +23,7 @@ const ndk = new NDK({
     ? process.env.RELAYS.split(",")
         .map((d) => d.trim())
         .filter((d) => !!d)
-    : ["wss://relay.nostr.band", "wss://relay.snort.social"],
+    : ["wss://relay.snort.social", "wss://nos.lol", "wss://relay.damus.io"],
   signer: privateKeySigner,
 });
 
